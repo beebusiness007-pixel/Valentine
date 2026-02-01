@@ -14,6 +14,7 @@
       justify-content: center;
       background: #ff7eb3;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
     .card {
       background: white;
@@ -23,6 +24,7 @@
       width: 90%;
       max-width: 360px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      z-index: 2;
     }
     h1 {
       color: #ff4d6d;
@@ -31,6 +33,7 @@
     p {
       color: #333;
       font-size: 16px;
+      line-height: 1.5;
     }
     .buttons {
       margin-top: 20px;
@@ -54,11 +57,28 @@
       background: #ccc;
       right: 10%;
     }
+
+    /* Floating hearts */
+    .float {
+      position: fixed;
+      bottom: -20px;
+      font-size: 18px;
+      animation: rise linear forwards;
+      opacity: 0.9;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    @keyframes rise {
+      to {
+        transform: translateY(-110vh);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
+  <div class="card" id="card">
     <h1>Hey Dikshii ❤️</h1>
     <p>Will you be my Valentine?</p>
     <div class="buttons">
@@ -67,10 +87,18 @@
     </div>
   </div>
 
+  <!-- Background music (plays only after YES click) -->
+  <audio id="bgm" preload="auto">
+    <!-- Soft romantic instrumental (royalty-free preview) -->
+    <source src="https://cdn.pixabay.com/download/audio/2022/10/03/audio_5d9b2b7c6e.mp3?filename=romantic-piano-ambient-112191.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
     const noBtn = document.getElementById("no");
     const yesBtn = document.getElementById("yes");
+    const bgm = document.getElementById("bgm");
 
+    // Make NO run away (mobile-safe)
     noBtn.addEventListener("touchstart", move);
     noBtn.addEventListener("click", move);
 
@@ -79,18 +107,38 @@
       noBtn.style.top = Math.random() * 30 + "px";
     }
 
+    // YES clicked
     yesBtn.onclick = () => {
+      // Start music (allowed after user gesture)
+      bgm.volume = 0.6;
+      bgm.play().catch(()=>{});
+
+      // Show final message
       document.body.innerHTML = `
         <div class="card">
           <h1>Dikshii 💕</h1>
           <p>
             I knew it 😌<br>
             Happy Valentine’s Day ❤️<br><br>
-            From someone who really likes you 💫
+            <strong>You owe me a coffee ☕😉</strong>
           </p>
         </div>
       `;
+
+      // Launch floating "Dikshii ❤️" hearts
+      for (let i = 0; i < 40; i++) spawn();
+      setInterval(spawn, 400);
     };
+
+    function spawn() {
+      const el = document.createElement("div");
+      el.className = "float";
+      el.textContent = Math.random() > 0.5 ? "❤️ Dikshii" : "Dikshii ❤️";
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.animationDuration = (3 + Math.random() * 3) + "s";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 6000);
+    }
   </script>
 
 </body>
